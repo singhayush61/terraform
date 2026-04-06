@@ -85,3 +85,16 @@ resource "aws_route_table_association" "private" {
   subnet_id      = each.value.id
 }
 
+resource "aws_s3_bucket" "my-new-bucket-s3-ayushaws" {
+  bucket = "my-new-bucket-s3-ayushaws-tf"
+
+  tags = {
+    Name = "My S3 Bucket"
+    Purpose = "Intro to Resource Blocks Lab"
+  }
+}
+
+resource "aws_s3_bucket_acl" "my_new-bucket-s3-ayushaws-acl" {
+  bucket = aws_s3_bucket.my-new-bucket-s3-ayushaws.id
+  acl    = "private"
+}
