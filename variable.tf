@@ -6,7 +6,7 @@ variable "aws_region" {
 
 variable "vpc_name" {
   type    = string
-  default = "vpc"
+  default = "vpc-terraform"
 }
 
 variable "vpc_cidr" {
