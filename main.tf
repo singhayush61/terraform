@@ -11,7 +11,7 @@ resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr
   tags = {
     Name        = var.vpc_name
-    Environment = "demo_environment"
+    Environment = "environment"
     Terraform   = "true"
   }
 }
@@ -45,7 +45,7 @@ resource "aws_subnet" "public_subnets" {
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "demo_igw"
+    Name = "igw"
   }
 }
 
@@ -57,7 +57,7 @@ resource "aws_route_table" "public_route_table" {
     gateway_id = aws_internet_gateway.internet_gateway.id
   }
   tags = {
-    Name      = "demo_public_rtb"
+    Name      = "public_rtb"
     Terraform = "true"
   }
 }
@@ -67,7 +67,7 @@ resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc.id
   # No route to 0.0.0.0/0 here means no NAT Gateway needed!
   tags = {
-    Name      = "demo_private_rtb"
+    Name      = "private_rtb"
     Terraform = "true"
   }
 }
