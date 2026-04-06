@@ -5,6 +5,14 @@ provider "aws" {
 
 # Retrieve the list of AZs
 data "aws_availability_zones" "available" {}
+data "aws_region" "current" {}
+
+locals {
+  team = "api_mgmt_dev"
+  application = "corp_api"
+  server_name = "ec2-${var.environment}-api-${var.variables_sub_az}"
+}
+
 
 # 1. Define the VPC (Free)
 resource "aws_vpc" "vpc" {
@@ -125,5 +133,28 @@ resource "aws_security_group" "my-new-security-group" {
   tags = {
     Name    = "web_server_inbound"
     Purpose = "Intro to Resource Blocks Lab"
+  }
+}
+
+resource "aws_instance" "web_server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.public_subnets["public_subnet_1"].id
+  tags = {
+    Name = local.server_name
+    Owner = local.team
+    App = local.application
+  }
+}
+
+resource "aws_subnet" "variables-subnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.variables_sub_cidr
+  availability_zone       = var.variables_sub_az
+  map_public_ip_on_launch = var.variables_sub_auto_ip
+
+  tags = {
+    Name      = "sub-variables-${var.variables_sub_az}"
+    Terraform = "true"
   }
 }
