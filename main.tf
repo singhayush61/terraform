@@ -3,14 +3,12 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-#Retrieve the list of AZs in the current AWS region
+# Retrieve the list of AZs
 data "aws_availability_zones" "available" {}
-data "aws_region" "current" {}
 
-#Define the VPC 
+# 1. Define the VPC (Free)
 resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr
-
   tags = {
     Name        = var.vpc_name
     Environment = "demo_environment"
@@ -18,7 +16,7 @@ resource "aws_vpc" "vpc" {
   }
 }
 
-#Deploy the private subnets
+# 2. Deploy Private Subnets (Free)
 resource "aws_subnet" "private_subnets" {
   for_each          = var.private_subnets
   vpc_id            = aws_vpc.vpc.id
@@ -30,65 +28,20 @@ resource "aws_subnet" "private_subnets" {
   }
 }
 
-#Deploy the public subnets
+# 3. Deploy Public Subnets (Free)
 resource "aws_subnet" "public_subnets" {
   for_each                = var.public_subnets
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = cidrsubnet(var.vpc_cidr, 8, each.value + 100)
-  availability_zone = data.aws_availability_zones.available.names[each.value % length(data.aws_availability_zones.available.names)]
+  availability_zone       = data.aws_availability_zones.available.names[each.value % length(data.aws_availability_zones.available.names)]
   map_public_ip_on_launch = true
-
   tags = {
     Name      = each.key
     Terraform = "true"
   }
 }
 
-#Create route tables for public and private subnets
-resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.internet_gateway.id
-    #nat_gateway_id = aws_nat_gateway.nat_gateway.id
-  }
-  tags = {
-    Name      = "demo_public_rtb"
-    Terraform = "true"
-  }
-}
-
-resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    # gateway_id     = aws_internet_gateway.internet_gateway.id
-    nat_gateway_id = aws_nat_gateway.nat_gateway.id
-  }
-  tags = {
-    Name      = "demo_private_rtb"
-    Terraform = "true"
-  }
-}
-
-#Create route table associations
-resource "aws_route_table_association" "public" {
-  depends_on     = [aws_subnet.public_subnets]
-  route_table_id = aws_route_table.public_route_table.id
-  for_each       = aws_subnet.public_subnets
-  subnet_id      = each.value.id
-}
-
-resource "aws_route_table_association" "private" {
-  depends_on     = [aws_subnet.private_subnets]
-  route_table_id = aws_route_table.private_route_table.id
-  for_each       = aws_subnet.private_subnets
-  subnet_id      = each.value.id
-}
-
-#Create Internet Gateway
+# 4. Internet Gateway (Free)
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = aws_vpc.vpc.id
   tags = {
@@ -96,21 +49,39 @@ resource "aws_internet_gateway" "internet_gateway" {
   }
 }
 
-#Create EIP for NAT Gateway
-resource "aws_eip" "nat_gateway_eip" {
-  depends_on = [aws_internet_gateway.internet_gateway]
+# 5. Public Route Table (Free)
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.internet_gateway.id
+  }
   tags = {
-    Name = "demo_igw_eip"
+    Name      = "demo_public_rtb"
+    Terraform = "true"
   }
 }
 
-#Create NAT Gateway
-resource "aws_nat_gateway" "nat_gateway" {
-  depends_on    = [aws_subnet.public_subnets]
-  allocation_id = aws_eip.nat_gateway_eip.id
-  subnet_id     = aws_subnet.public_subnets["public_subnet_1"].id
+# 6. Private Route Table (Free - No NAT Gateway route)
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.vpc.id
+  # No route to 0.0.0.0/0 here means no NAT Gateway needed!
   tags = {
-    Name = "demo_nat_gateway"
+    Name      = "demo_private_rtb"
+    Terraform = "true"
   }
+}
+
+# 7. Route Table Associations (Free)
+resource "aws_route_table_association" "public" {
+  for_each       = aws_subnet.public_subnets
+  route_table_id = aws_route_table.public_route_table.id
+  subnet_id      = each.value.id
+}
+
+resource "aws_route_table_association" "private" {
+  for_each       = aws_subnet.private_subnets
+  route_table_id = aws_route_table.private_route_table.id
+  subnet_id      = each.value.id
 }
 
