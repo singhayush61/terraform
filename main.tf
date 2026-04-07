@@ -36,7 +36,7 @@ resource "aws_subnet" "private_subnets" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = cidrsubnet(var.vpc_cidr, 8, each.value)
   availability_zone = data.aws_availability_zones.available.names[each.value % length(data.aws_availability_zones.available.names)]
-  tags = { Name = each.key }
+  tags              = { Name = each.key }
 }
 
 resource "aws_subnet" "public_subnets" {
@@ -45,7 +45,7 @@ resource "aws_subnet" "public_subnets" {
   cidr_block              = cidrsubnet(var.vpc_cidr, 8, each.value + 100)
   availability_zone       = data.aws_availability_zones.available.names[each.value % length(data.aws_availability_zones.available.names)]
   map_public_ip_on_launch = true
-  tags = { Name = each.key }
+  tags                    = { Name = each.key }
 }
 
 resource "aws_internet_gateway" "igw" {
@@ -128,12 +128,12 @@ resource "aws_key_pair" "deployer" {
 resource "aws_instance" "ubuntu_server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
-  
+
   # Deploy to PRIVATE subnet for $0 cost
   subnet_id = aws_subnet.private_subnets["private_subnet_1"].id
-  
+
   # Disabling Public IP to avoid the $0.005/hr fee
-  associate_public_ip_address = false 
+  associate_public_ip_address = false
 
   vpc_security_group_ids = [aws_security_group.web_sg.id]
   key_name               = aws_key_pair.deployer.key_name
