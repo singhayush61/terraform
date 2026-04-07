@@ -1,4 +1,3 @@
-
 variable "aws_region" {
   type    = string
   default = "ap-south-1"
@@ -41,8 +40,6 @@ variable "variables_sub_az" {
   type        = string
   default     = "ap-south-1a"
 }
-
-
 
 variable "variables_sub_auto_ip" {
   description = "Set Automatic IP Assignment for Variables Subnet"
