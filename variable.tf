@@ -33,13 +33,13 @@ variable "public_subnets" {
 variable "variables_sub_cidr" {
   description = "CIDR Block for the Variables Subnet"
   type        = string
-  default = "10.0.202.0/24"
+  default     = "10.0.202.0/24"
 }
 
 variable "variables_sub_az" {
   description = "Availability Zone used Variables Subnet"
   type        = string
-  default = "ap-south-1a"
+  default     = "ap-south-1a"
 }
 
 

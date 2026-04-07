@@ -7,11 +7,11 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 data "aws_region" "current" {}
 
-locals {
-  team = "api_mgmt_dev"
-  application = "corp_api"
-  server_name = "ec2-${var.environment}-api-${var.variables_sub_az}"
-}
+#locals {
+#  team = "api_mgmt_dev"
+#  application = "corp_api"
+#  server_name = "ec2-${var.environment}-api-${var.variables_sub_az}"
+#}
 
 
 # 1. Define the VPC (Free)
@@ -21,6 +21,7 @@ resource "aws_vpc" "vpc" {
     Name        = var.vpc_name
     Environment = "environment"
     Terraform   = "true"
+    Region      = data.aws_region.current.name
   }
 }
 
@@ -152,16 +153,16 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-resource "aws_instance" "web_server" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-  subnet_id     = aws_subnet.public_subnets["public_subnet_1"].id
-  tags = {
-    Name = local.server_name
-    Owner = local.team
-    App = local.application
-  }
-}
+#resource "aws_instance" "web_server" {
+#  ami           = data.aws_ami.ubuntu.id
+# instance_type = "t3.micro"
+#subnet_id     = aws_subnet.public_subnets["public_subnet_1"].id
+#  tags = {
+#    Name = local.server_name
+#    Owner = local.team
+#    App = local.application
+#  }
+#}
 
 resource "aws_subnet" "variables-subnet" {
   vpc_id                  = aws_vpc.vpc.id
