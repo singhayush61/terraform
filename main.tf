@@ -163,3 +163,19 @@ module "server" {
     aws_security_group.vpc-web.id
   ]
 }
+
+locals{
+  service_name = "Automation"
+  app_team = "Cloud"
+  createdby = "terraform"
+}
+
+locals{
+  common_tags = {
+    Owner  = local.team
+    App = local.application
+    Service = local.service_name
+    Team    = local.app_team
+    CreatedBy = local.createdby
+  }
+}
