@@ -164,18 +164,18 @@ module "server" {
   ]
 }
 
-locals{
+locals {
   service_name = "Automation"
-  app_team = "Cloud"
-  createdby = "terraform"
+  app_team     = "Cloud"
+  createdby    = "terraform"
 }
 
-locals{
+locals {
   common_tags = {
-    Owner  = local.team
-    App = local.application
-    Service = local.service_name
-    Team    = local.app_team
+    Owner     = local.team
+    App       = local.application
+    Service   = local.service_name
+    Team      = local.app_team
     CreatedBy = local.createdby
   }
 }
