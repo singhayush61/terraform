@@ -13,6 +13,7 @@ variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }
 
+
 variable "private_subnets" {
   default = {
     "private_subnet_1" = 1
@@ -62,4 +63,15 @@ variable "phone_number" {
 output "phone_number" {
   value     = var.phone_number
   sensitive = true
+}
+
+variable "us-east-1-azs" {
+    type = list(string)
+    default = [
+        "us-east-1a",
+        "us-east-1b",
+        "us-east-1c",
+        "us-east-1d",
+        "us-east-1e"
+    ]
 }
