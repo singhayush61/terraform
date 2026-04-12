@@ -189,6 +189,5 @@ resource "aws_vpc" "vpc" {
     Environment = upper(var.environment)
     Terraform   = upper("true")
   }
-
   enable_dns_hostnames = true
 }
