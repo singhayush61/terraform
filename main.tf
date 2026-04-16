@@ -3,6 +3,7 @@ provider "aws" {
   region = var.aws_region
 }
 
+
 # Data Sources
 data "aws_availability_zones" "available" {}
 data "aws_region" "current" {}
@@ -15,6 +16,7 @@ data "aws_ami" "ubuntu" {
     values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 }
+
 
 # Locals for Tagging
 locals {
@@ -30,6 +32,7 @@ resource "aws_vpc" "vpc" {
     Terraform = "true"
   }
 }
+
 
 resource "aws_subnet" "private_subnets" {
   for_each          = var.private_subnets
